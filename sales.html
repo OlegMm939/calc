@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Допродажи по клиентам</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@600;700&display=swap">
+<style>
+:root{
+  --bg:#F3EEE6; --paper:#FFFDF9; --ink:#1F1B17; --muted:#6E665C; --line:#E4DACB;
+  --accent:#D9573B; --accent-ink:#FFFFFF; --accent-soft:#FBE2D8;
+  --ok:#2F7D55; --ok-soft:#E1F1E7; --chip:#EFE8DD; --dark:#2A2521; --dark-ink:#FFFFFF;
+  --shadow:0 1px 0 rgba(31,27,23,.04),0 6px 20px -12px rgba(31,27,23,.25);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#171412; --paper:#221E1B; --ink:#F2ECE4; --muted:#A99F93; --line:#3A332D;
+    --accent:#EE7A5C; --accent-ink:#1A1310; --accent-soft:#4A2A20;
+    --ok:#6BC296; --ok-soft:#1E3A2B; --chip:#2E2925; --dark:#0F0D0B; --dark-ink:#F2ECE4;
+    --shadow:0 1px 0 rgba(0,0,0,.2),0 8px 24px -12px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#171412; --paper:#221E1B; --ink:#F2ECE4; --muted:#A99F93; --line:#3A332D;
+  --accent:#EE7A5C; --accent-ink:#1A1310; --accent-soft:#4A2A20;
+  --ok:#6BC296; --ok-soft:#1E3A2B; --chip:#2E2925; --dark:#0F0D0B; --dark-ink:#F2ECE4;
+  --shadow:0 1px 0 rgba(0,0,0,.2),0 8px 24px -12px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 "Manrope",system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:24px 60px}
+.h{font-family:"Unbounded","Manrope",system-ui,sans-serif;letter-spacing:-.01em}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;margin-bottom:18px}
+header.top h1{margin:0;font-size:26px;line-height:1.15;text-wrap:balance}
+header.top p{margin:4px 0 0;color:var(--muted);max-width:60ch}
+.sync{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.sync i{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block}
+.sync.on i{background:var(--ok)} .sync.warn i{background:var(--accent)}
+
+/* summary */
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.stat.main{background:var(--dark);border-color:var(--dark);color:var(--dark-ink)}
+.stat .k{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.stat.main .k{color:#E8B9A7}
+.stat .v{font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;margin-top:2px;white-space:nowrap}
+.stat .s{font-size:12.5px;color:var(--muted)}
+.stat.main .s{color:#CFC3B6}
+@media (max-width:760px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat .v{font-size:20px}}
+
+/* add bar */
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:10px;margin-bottom:12px;box-shadow:var(--shadow)}
+.bar input[type=text]{flex:1 1 220px;min-width:0;font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.bar input[type=text]:focus{outline:2px solid var(--accent);outline-offset:1px}
+.btn{font:inherit;font-weight:700;border:0;border-radius:10px;padding:10px 16px;cursor:pointer;background:var(--accent);color:var(--accent-ink)}
+.btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:600}
+.search{flex:0 1 200px}
+
+/* table */
+.tablebox{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow-x:auto;box-shadow:var(--shadow)}
+table{border-collapse:separate;border-spacing:0;width:100%;min-width:980px;font-size:14px}
+th,td{padding:8px 8px;border-bottom:1px solid var(--line);text-align:center;vertical-align:middle}
+thead th{position:sticky;top:0;background:var(--paper);z-index:2;font-size:11.5px;font-weight:700;color:var(--muted);line-height:1.25;vertical-align:bottom;padding-top:12px}
+thead th .pr{display:block;color:var(--ink);font-size:12.5px;font-weight:800;margin-top:3px;font-variant-numeric:tabular-nums}
+th.cl,td.cl{text-align:left;position:sticky;left:0;background:var(--paper);z-index:1;min-width:170px;border-right:1px solid var(--line)}
+thead th.cl{z-index:3}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:color-mix(in srgb,var(--paper) 92%,var(--accent) 8%)}
+.nick{font-weight:700;word-break:break-word}
+.date{display:block;font-size:11.5px;color:var(--muted);font-weight:500}
+select{font:inherit;font-size:13px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 6px;max-width:190px}
+.tick{position:relative;display:inline-flex;align-items:center;justify-content:center;width:40px;height:34px;cursor:pointer}
+.tick input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}
+.tick span{width:24px;height:24px;border-radius:7px;border:2px solid var(--line);background:var(--bg);display:flex;align-items:center;justify-content:center;transition:all .12s}
+.tick input:checked + span{background:var(--ok);border-color:var(--ok)}
+.tick input:checked + span:after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 3px 3px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.tick input:focus-visible + span{outline:2px solid var(--accent);outline-offset:2px}
+td.sum{font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right;padding-right:14px}
+td.sum small{display:block;font-weight:600;font-size:11.5px;color:var(--muted)}
+th.sumh{text-align:right;padding-right:14px}
+.del{background:none;border:0;color:var(--muted);cursor:pointer;font-size:18px;line-height:1;padding:4px 6px;border-radius:6px}
+.del:hover,.del:focus-visible{color:var(--accent);background:var(--accent-soft)}
+.del.sure{font-size:12.5px;font-weight:700;color:var(--accent-ink);background:var(--accent);padding:6px 8px;white-space:nowrap}
+tfoot td{background:var(--chip);font-weight:800;font-variant-numeric:tabular-nums;border-bottom:0}
+tfoot td.cl{background:var(--chip)}
+.empty{padding:34px 16px;text-align:center;color:var(--muted)}
+.empty b{color:var(--ink)}
+.note{font-size:12.5px;color:var(--muted);margin-top:10px}
+.warn{background:var(--accent-soft);color:var(--ink);border-radius:10px;padding:8px 12px;font-size:13px;margin-bottom:12px}
+@media (prefers-reduced-motion:reduce){.tick span{transition:none}}
+.gate{max-width:420px;margin:40px auto;background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:var(--shadow)}
+.gate h2{margin:0 0 6px;font-size:20px}
+.gate p{margin:0 0 14px;color:var(--muted);font-size:14px}
+.gate label{display:block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:10px 0 4px}
+.gate input{width:100%;font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.gate .btn{margin-top:14px;width:100%}
+.gate .err{color:var(--accent);font-size:13px;margin-top:8px;min-height:1em}
+.linkbtn{background:none;border:0;color:var(--muted);font:inherit;font-size:12.5px;text-decoration:underline;cursor:pointer;padding:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1 class="h">Допродажи по клиентам</h1>
+      <p>Впиши ник клиента, отметь галочками, что он купил, — итог считается сам.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+      <div class="sync" id="sync"><i></i><span>Подключаюсь…</span></div>
+      <button class="linkbtn" id="logout" type="button" hidden>Выйти</button>
+    </div>
+  </header>
+
+  <form class="gate" id="gate" hidden autocomplete="off">
+    <h2 class="h">Вход</h2>
+    <p>Введи PIN-код — его знаете только ты и менеджер. Устройство запомнит его.</p>
+    <div id="urlBox" hidden>
+      <label for="urlInput">Адрес хранилища</label>
+      <input id="urlInput" type="url" placeholder="https://script.google.com/macros/s/…/exec">
+    </div>
+    <label for="pinInput">PIN-код</label>
+    <input id="pinInput" type="password" inputmode="numeric" autocomplete="off">
+    <button class="btn" type="submit">Войти</button>
+    <div class="err" id="gateErr"></div>
+  </form>
+
+  <main id="app" hidden>
+    <section class="stats" aria-label="Итоги">
+      <div class="stat main"><div class="k">Всего выручка</div><div class="v" id="sTotal">0 ₽</div><div class="s">бот + допродажи</div></div>
+      <div class="stat"><div class="k">Допродажи</div><div class="v" id="sUp">0 ₽</div><div class="s" id="sUpSub">средний чек —</div></div>
+      <div class="stat"><div class="k">Продано услуг</div><div class="v" id="sSold">0</div><div class="s">всего галочек</div></div>
+      <div class="stat"><div class="k">Клиентов</div><div class="v" id="sCount">0</div><div class="s" id="sCountSub">из них с допродажами —</div></div>
+    </section>
+
+    <form class="bar" id="addForm" autocomplete="off">
+      <input type="text" id="nickInput" placeholder="@ник клиента" aria-label="Ник клиента" maxlength="64">
+      <button class="btn" type="submit">Добавить клиента</button>
+      <input type="text" id="searchInput" class="search" placeholder="Поиск по нику" aria-label="Поиск по нику">
+    </form>
+
+    <div class="tablebox">
+      <table>
+        <thead><tr id="headRow"></tr></thead>
+        <tbody id="rows"></tbody>
+        <tfoot><tr id="footRow"></tr></tfoot>
+      </table>
+      <div class="empty" id="empty" hidden><b>Пока ни одного клиента.</b><br>Впиши ник в поле выше и нажми «Добавить клиента».</div>
+    </div>
+    <p class="note">Всё сохраняется в твою Google Таблицу. Изменения менеджера подтягиваются сами каждые 30 секунд.</p>
+  </main>
+</div>
+
+<script>
+(function(){
+  /* ▼ Вставь сюда адрес из Apps Script (заканчивается на /exec). Пусто — страница спросит его при входе. */
+  var API_URL = "https://script.google.com/macros/s/AKfycbwpXRymwQceMRQibQjYnQVG2F2rBybOjog3autPo32Cfiy-hTQR1ayDjDpwCDPMBqJ-/exec";
+
+  var TARIFFS=[{id:"",name:"—",price:0},{id:"fast",name:"Быстрый старт",price:4900},{id:"key",name:"Под ключ",price:9900},{id:"full",name:"На всю катушку",price:24900}];
+  var ITEMS=[
+    {id:"srv",name:"Сервер и платежи",price:990},
+    {id:"cnt",name:"Контент, 15 постов",price:1490},
+    {id:"ig",name:"Аккаунты Instagram, 5 шт",price:490},
+    {id:"wb",name:"Группы селлеров, 200 шт",price:2900},
+    {id:"tg",name:"Каналы для рекламы, 50 шт",price:900},
+    {id:"cr",name:"Креативы, 5 шт",price:990},
+    {id:"ref",name:"Партнёрские ссылки, 10 шт",price:900}
+  ];
+  var LS={pin:"ups_pin",url:"ups_url",cache:"ups_cache"};
+  var clients={}, filter="", pin="", api="", busy=0, dirty={};
+
+  var $=function(id){return document.getElementById(id)};
+  var rub=function(n){return Number(n||0).toLocaleString("ru-RU").replace(/\u00A0/g," ")+" ₽"};
+  function esc(s){var d=document.createElement("div");d.textContent=s==null?"":String(s);return d.innerHTML}
+  function lsGet(k){try{return localStorage.getItem(k)||""}catch(e){return ""}}
+  function lsSet(k,v){try{v?localStorage.setItem(k,v):localStorage.removeItem(k)}catch(e){}}
+  function tariffById(id){for(var i=0;i<TARIFFS.length;i++) if(TARIFFS[i].id===id) return TARIFFS[i];return TARIFFS[0]}
+  function tariffByName(n){for(var i=0;i<TARIFFS.length;i++) if(TARIFFS[i].name===n) return TARIFFS[i].id;return ""}
+  function upsell(c){var s=0;ITEMS.forEach(function(it){if(c.items[it.id]) s+=it.price});return s}
+  function total(c){return tariffById(c.tariff).price+upsell(c)}
+  function setSync(cls,text){var el=$("sync");el.className="sync "+cls;el.lastElementChild.textContent=text}
+
+  /* ── API ── */
+  function apiGet(){
+    return fetch(api+"?pin="+encodeURIComponent(pin)+"&t="+Date.now()).then(function(r){return r.json()});
+  }
+  function apiPost(body){
+    body.pin=pin;
+    return fetch(api,{method:"POST",body:JSON.stringify(body)}).then(function(r){return r.json()});
+  }
+  function toRow(id,c){
+    var o={id:id,created:c.created,nick:c.nick,tariff:tariffById(c.tariff).id?tariffById(c.tariff).name:"",total:total(c)};
+    ITEMS.forEach(function(it){o[it.id]=c.items[it.id]?"✓":""});
+    return o;
+  }
+  function fromRow(r){
+    var c={nick:String(r.nick||""),tariff:tariffByName(r.tariff),items:{},created:Number(r.created)||0};
+    ITEMS.forEach(function(it){c.items[it.id]=String(r[it.id]||"").trim()!==""});
+    return c;
+  }
+
+  var queue=Promise.resolve();
+  function save(id,action){
+    dirty[id]=true; busy++; setSync("","Сохраняю…");
+    var c=clients[id];
+    queue=queue.then(function(){
+      var body=action==="delete"?{action:"delete",client:{id:id}}:{action:"upsert",client:toRow(id,c)};
+      return apiPost(body).then(function(res){ if(!res||!res.ok) throw new Error(res&&res.error||"fail"); });
+    }).then(function(){
+      busy--; delete dirty[id]; if(!busy) setSync("on","Сохранено");
+    },function(){
+      busy--; setSync("warn","Не сохранилось — проверь интернет и нажми ещё раз");
+    });
+    cache();
+  }
+  function cache(){lsSet(LS.cache,JSON.stringify(clients))}
+
+  function load(first){
+    if(busy) return Promise.resolve();
+    return apiGet().then(function(res){
+      if(!res||!res.ok){ if(res&&res.error==="pin"){ logout("Неверный PIN-код"); } else setSync("warn","Хранилище не отвечает"); return; }
+      var next={}; (res.clients||[]).forEach(function(r){ next[String(r.id)]=fromRow(r); });
+      Object.keys(dirty).forEach(function(id){ if(clients[id]) next[id]=clients[id]; });
+      clients=next; cache(); render(); setSync("on","Сохранено");
+      if(first){ $("gate").hidden=true; $("app").hidden=false; $("logout").hidden=false; }
+    }).catch(function(){ setSync("warn","Нет связи с таблицей"); if(first) gateError("Не получилось подключиться. Проверь адрес хранилища и интернет."); });
+  }
+
+  /* ── вход ── */
+  function gateError(t){$("gateErr").textContent=t||""}
+  function showGate(msg){
+    $("app").hidden=true; $("gate").hidden=false; $("logout").hidden=true;
+    $("urlBox").hidden=!!API_URL; $("urlInput").value=api||""; gateError(msg); setSync("","Нужен вход");
+    setTimeout(function(){ (API_URL?$("pinInput"):($("urlInput").value?$("pinInput"):$("urlInput"))).focus(); },50);
+  }
+  function logout(msg){ lsSet(LS.pin,""); lsSet(LS.cache,""); pin=""; clients={}; showGate(msg); }
+  $("logout").addEventListener("click",function(){logout("")});
+  $("gate").addEventListener("submit",function(e){
+    e.preventDefault();
+    var u=API_URL||$("urlInput").value.trim(), p=$("pinInput").value.trim();
+    if(!/^https:\/\/script\.google\.com\/.+\/exec$/.test(u)){ gateError("Адрес должен начинаться с https://script.google.com/ и заканчиваться на /exec"); return; }
+    if(!p){ gateError("Введи PIN-код"); return; }
+    api=u; pin=p; gateError(""); setSync("","Проверяю…");
+    apiGet().then(function(res){
+      if(res&&res.ok){ lsSet(LS.pin,pin); lsSet(LS.url,api); $("pinInput").value=""; load(true); }
+      else gateError(res&&res.error==="pin"?"Неверный PIN-код":"Хранилище ответило ошибкой");
+    }).catch(function(){ gateError("Не получилось подключиться. Проверь адрес и интернет."); });
+  });
+
+  /* ── таблица ── */
+  (function(){
+    var h='<th class="cl" scope="col">Клиент</th><th scope="col">Тариф бота</th>';
+    ITEMS.forEach(function(it){h+='<th scope="col">'+esc(it.name)+'<span class="pr">'+rub(it.price)+'</span></th>'});
+    h+='<th class="sumh" scope="col">Итого</th><th scope="col"><span style="position:absolute;left:-9999px">Удалить</span></th>';
+    $("headRow").innerHTML=h;
+  })();
+
+  function render(){
+    var ids=Object.keys(clients).sort(function(a,b){return (clients[b].created||0)-(clients[a].created||0)});
+    var q=filter.trim().toLowerCase().replace(/^@/,"");
+    var shown=ids.filter(function(id){return !q||clients[id].nick.toLowerCase().replace(/^@/,"").indexOf(q)>-1});
+    var html="";
+    shown.forEach(function(id){
+      var c=clients[id], up=upsell(c), tp=tariffById(c.tariff).price;
+      var opts=TARIFFS.map(function(t){return '<option value="'+t.id+'"'+(c.tariff===t.id?' selected':'')+'>'+esc(t.name)+(t.price?' · '+rub(t.price):'')+'</option>'}).join("");
+      html+='<tr data-id="'+esc(id)+'"><td class="cl"><span class="nick">'+esc(c.nick)+'</span><span class="date">'+(c.created?new Date(c.created).toLocaleDateString("ru-RU"):"")+'</span></td>';
+      html+='<td><select data-act="tariff" aria-label="Тариф бота для '+esc(c.nick)+'">'+opts+'</select></td>';
+      ITEMS.forEach(function(it){
+        html+='<td><label class="tick"><input type="checkbox" data-act="item" data-item="'+it.id+'"'+(c.items[it.id]?' checked':'')+' aria-label="'+esc(it.name)+' — '+esc(c.nick)+'"><span></span></label></td>';
+      });
+      html+='<td class="sum">'+rub(tp+up)+(up&&tp?'<small>допродажи '+rub(up)+'</small>':'')+'</td>';
+      html+='<td><button class="del" type="button" data-act="del" title="Удалить клиента" aria-label="Удалить '+esc(c.nick)+'">×</button></td></tr>';
+    });
+    $("rows").innerHTML=html;
+    $("empty").hidden=ids.length>0;
+
+    var tot=0,upTot=0,sold=0,withUp=0,col={};
+    ids.forEach(function(id){var c=clients[id],u=upsell(c);tot+=total(c);upTot+=u;if(u)withUp++;
+      ITEMS.forEach(function(it){if(c.items[it.id]){col[it.id]=(col[it.id]||0)+1;sold++}})});
+    $("sTotal").textContent=rub(tot);
+    $("sUp").textContent=rub(upTot);
+    $("sUpSub").textContent=withUp?("средний чек "+rub(Math.round(upTot/withUp))):"средний чек —";
+    $("sSold").textContent=sold;
+    $("sCount").textContent=ids.length;
+    $("sCountSub").textContent="из них с допродажами — "+withUp;
+    var f='<td class="cl">Итого · '+ids.length+'</td><td></td>';
+    ITEMS.forEach(function(it){var n=col[it.id]||0;f+='<td>'+(n?n+' шт<br><small style="font-weight:600;color:var(--muted)">'+rub(n*it.price)+'</small>':'—')+'</td>'});
+    f+='<td class="sum">'+rub(tot)+'</td><td></td>';
+    $("footRow").innerHTML=f;
+  }
+
+  $("addForm").addEventListener("submit",function(e){
+    e.preventDefault();
+    var nick=$("nickInput").value.trim(); if(!nick) return;
+    if(nick[0]!=="@" && /^[A-Za-z0-9_]{3,}$/.test(nick)) nick="@"+nick;
+    var id="c"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+    clients[id]={nick:nick,tariff:"",items:{},created:Date.now()};
+    render(); save(id,"upsert");
+    $("nickInput").value=""; $("nickInput").focus();
+  });
+  $("searchInput").addEventListener("input",function(){filter=this.value;render()});
+  $("addForm").addEventListener("keydown",function(e){if(e.target.id==="searchInput"&&e.key==="Enter")e.preventDefault()});
+
+  $("rows").addEventListener("change",function(e){
+    var el=e.target, tr=el.closest("tr"); if(!tr) return; var id=tr.getAttribute("data-id"), c=clients[id]; if(!c) return;
+    if(el.getAttribute("data-act")==="item"){ c.items[el.getAttribute("data-item")]=el.checked; }
+    else if(el.getAttribute("data-act")==="tariff"){ c.tariff=el.value; }
+    else return;
+    render(); save(id,"upsert");
+  });
+  $("rows").addEventListener("click",function(e){
+    var b=e.target.closest("[data-act=del]"); if(!b) return; var id=b.closest("tr").getAttribute("data-id");
+    if(!b.classList.contains("sure")){
+      b.classList.add("sure"); b.textContent="Удалить?";
+      setTimeout(function(){ if(b.isConnected){ b.classList.remove("sure"); b.textContent="×"; } },3000);
+      return;
+    }
+    delete clients[id]; render(); save(id,"delete");
+  });
+
+  /* ── старт ── */
+  api=API_URL||lsGet(LS.url); pin=lsGet(LS.pin);
+  try{ clients=JSON.parse(lsGet(LS.cache)||"{}")||{}; }catch(e){ clients={}; }
+  if(api&&pin){ $("app").hidden=false; $("logout").hidden=false; render(); load(true); }
+  else showGate("");
+  setInterval(function(){ if(pin&&api&&!document.hidden) load(false); },30000);
+  document.addEventListener("visibilitychange",function(){ if(!document.hidden&&pin&&api) load(false); });
+})();
+</script>
+</body>
+</html>
