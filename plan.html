@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>План привлечения клиентов на 28 дней</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{
+  --bg:#f6f3ee; --card:#ffffff; --ink:#1d1b18; --muted:#6f6a62; --line:#e6e0d6;
+  --accent:#d9573b; --accent-soft:#fbe7e1; --ok:#2f8f5b; --ok-soft:#e2f3e9;
+  --t-bot:#3b6fd9; --t-chan:#d9573b; --t-video:#9a4fd1; --t-comm:#2f8f5b; --t-art:#c98a12; --t-an:#5b6573;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+.wrap{max-width:1040px;margin:0 auto;padding:0 16px 80px}
+header.hero{background:linear-gradient(135deg,#2a2521 0%,#4a3a30 100%);color:#fff;padding:40px 0 34px;margin-bottom:28px}
+.hero .wrap{padding-bottom:0}
+.hero h1{margin:0 0 8px;font-size:34px;line-height:1.15;letter-spacing:-.5px}
+.hero p{margin:0;color:#e8ddd2;max-width:680px}
+.hero .meta{display:flex;flex-wrap:wrap;margin-top:22px}
+.hero .meta div{background:rgba(255,255,255,.1);border-radius:12px;padding:10px 14px;margin:0 10px 10px 0}
+.hero .meta b{display:block;font-size:20px}
+.hero .meta span{font-size:12px;color:#d9ccbf;text-transform:uppercase;letter-spacing:.5px}
+.progress{background:rgba(255,255,255,.15);height:10px;border-radius:6px;overflow:hidden;margin-top:14px;max-width:520px}
+.progress i{display:block;height:100%;width:0;background:#f2a27f;border-radius:6px;transition:width .3s}
+.ptext{font-size:13px;color:#e8ddd2;margin-top:6px}
+nav.toc{position:sticky;top:0;z-index:5;background:rgba(246,243,238,.96);border-bottom:1px solid var(--line);margin:0 -16px 24px;padding:10px 16px;display:flex;flex-wrap:wrap}
+nav.toc a{color:var(--ink);text-decoration:none;font-size:14px;padding:5px 12px;border-radius:20px;margin:2px 6px 2px 0;background:#fff;border:1px solid var(--line)}
+nav.toc a:hover{border-color:var(--accent);color:var(--accent)}
+h2{font-size:24px;margin:40px 0 6px;letter-spacing:-.3px}
+.lead{color:var(--muted);margin:0 0 18px;max-width:760px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
+.legend{display:flex;flex-wrap:wrap;margin:0 0 14px}
+.legend span{font-size:13px;margin:0 14px 6px 0;display:flex;align-items:center;color:var(--muted)}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+.cal-title{margin:0 0 12px;font-size:17px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);grid-gap:8px}
+.cal .dow{font-size:12px;color:var(--muted);text-align:center;text-transform:uppercase;letter-spacing:.5px}
+.day{background:#fff;border:1px solid var(--line);border-radius:12px;min-height:104px;padding:8px 8px 20px;cursor:pointer;position:relative;transition:transform .1s,border-color .1s}
+.day:hover{border-color:var(--accent);transform:translateY(-1px)}
+.day.empty{background:transparent;border:1px dashed var(--line);cursor:default}
+.day.empty:hover{transform:none;border-color:var(--line)}
+.day .n{font-weight:700;font-size:17px}
+.day .mon{font-size:11px;font-weight:700;color:var(--accent);margin-left:5px;text-transform:uppercase}
+.day .w{font-size:11px;color:var(--muted);display:block;margin-top:1px;line-height:1.25}
+.day .dots{display:block;margin-top:6px}
+.day .dots .dot{width:8px;height:8px;margin-right:3px}
+.day .bar{position:absolute;left:8px;right:8px;bottom:8px;height:5px;background:#eee8df;border-radius:3px;overflow:hidden}
+.day .bar i{display:block;height:100%;width:0;background:var(--ok)}
+.day.today{box-shadow:0 0 0 2px var(--accent)}
+.day.done{background:var(--ok-soft);border-color:#b9e0c9}
+.day.done:after{content:"✓";position:absolute;top:6px;right:9px;color:var(--ok);font-weight:800;font-size:18px}
+.day.rest .w{color:var(--ok)}
+.week{margin-top:34px}
+.week-head{display:flex;align-items:baseline;flex-wrap:wrap;border-bottom:2px solid var(--ink);padding-bottom:8px;margin-bottom:14px}
+.week-head .num{background:var(--ink);color:#fff;border-radius:8px;padding:2px 10px;font-size:13px;margin-right:12px;font-weight:700}
+.week-head h3{margin:0 12px 0 0;font-size:21px}
+.week-head .dates{color:var(--muted);font-size:14px}
+.week-goal{background:var(--accent-soft);border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:14px}
+.week-goal b{color:var(--accent)}
+.dcard{background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden}
+.dcard.flash{animation:flash 1.4s}
+@keyframes flash{0%{box-shadow:0 0 0 4px var(--accent)}100%{box-shadow:0 0 0 0 transparent}}
+.dcard.done{border-color:#b9e0c9}
+.dhead{display:flex;align-items:center;padding:12px 16px;background:#fbf9f6;border-bottom:1px solid var(--line)}
+.dcard.done .dhead{background:var(--ok-soft)}
+.dhead .date{font-weight:700;font-size:16px;min-width:150px}
+.dhead .focus{color:var(--muted);font-size:14px;flex:1}
+.dhead .cnt{font-size:13px;font-weight:700;color:var(--muted);white-space:nowrap}
+.dcard.done .dhead .cnt{color:var(--ok)}
+.tasks{list-style:none;margin:0;padding:6px 16px 10px}
+.tasks li{display:flex;align-items:flex-start;padding:8px 0;border-bottom:1px dashed #efe9e0}
+.tasks li:last-child{border-bottom:0}
+.tasks label{display:flex;align-items:flex-start;cursor:pointer;flex:1}
+.tasks input{appearance:none;-webkit-appearance:none;width:22px;height:22px;min-width:22px;border:2px solid #cfc6b8;border-radius:6px;margin:1px 12px 0 0;cursor:pointer;position:relative;background:#fff;transition:all .15s}
+.tasks input:checked{background:var(--ok);border-color:var(--ok)}
+.tasks input:checked:after{content:"";position:absolute;left:6px;top:2px;width:6px;height:11px;border:solid #fff;border-width:0 3px 3px 0;transform:rotate(45deg)}
+.tasks .txt{flex:1}
+.tasks input:checked + .txt .t{text-decoration:line-through;color:#9b958c}
+.tasks .t{font-weight:600}
+.tasks .how{display:block;font-size:13.5px;color:var(--muted);margin-top:2px}
+.pill{font-size:11px;font-weight:700;color:#fff;border-radius:10px;padding:2px 8px;margin-left:10px;white-space:nowrap;margin-top:2px}
+.routine{border-top:1px solid var(--line);background:#fcfbf9;padding:4px 16px 8px}
+.routine .rt{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:700;padding-top:8px}
+.routine .tasks{padding:0}
+.routine .tasks li{padding:5px 0;border:0}
+.routine .t{font-weight:500;font-size:14px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{border-bottom:1px solid var(--line);padding:9px 10px;text-align:left;vertical-align:top}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);background:#fbf9f6}
+td input{width:100%;min-width:60px;border:1px solid var(--line);border-radius:8px;padding:6px 8px;font:inherit;background:#fff}
+.scroll{overflow-x:auto}
+.grid2{display:grid;grid-template-columns:1fr 1fr;grid-gap:14px}
+.rule{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px}
+.rule h4{margin:0 0 6px;font-size:16px}
+.rule p{margin:0;color:var(--muted);font-size:14px}
+.tpl{background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:14px}
+.tpl-h{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line)}
+.tpl-h b{font-size:15px}
+.tpl pre{margin:0;padding:14px 16px;white-space:pre-wrap;font-family:inherit;font-size:14px;line-height:1.55;color:#34302b}
+button{font:inherit;font-size:13px;border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 12px;cursor:pointer;color:var(--ink)}
+button:hover{border-color:var(--accent);color:var(--accent)}
+.note{font-size:13px;color:var(--muted)}
+footer{margin-top:50px;color:var(--muted);font-size:13px;text-align:center}
+@media (max-width:720px){
+  .hero h1{font-size:26px}
+  .day{min-height:62px;padding:5px 5px 14px}
+  .day .w,.day .mon{display:none}
+  .day .dots{margin-top:3px}
+  .day .dots .dot{width:6px;height:6px;margin-right:2px}
+  .day .bar{left:5px;right:5px;bottom:5px;height:4px}
+  .day.done:after{top:3px;right:5px;font-size:14px}
+  .cal{grid-gap:4px}
+  .card{padding:12px}
+  .grid2{grid-template-columns:1fr}
+  .dhead{flex-wrap:wrap}
+  .dhead .date{min-width:0;margin-right:10px}
+  .dhead .focus{flex-basis:100%;order:3;margin-top:2px}
+  .pill{display:none}
+}
+@media print{
+  nav.toc,button{display:none}
+  body{background:#fff}
+  .dcard,.tpl,.rule{break-inside:avoid}
+}
+
+.cal{grid-template-columns:86px repeat(7,1fr)}
+.cal .wk{display:flex;flex-direction:column;justify-content:center;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;line-height:1.3}
+.cal .wk small{font-weight:500;text-transform:none;letter-spacing:0;font-size:11px}
+.day .n{font-size:15px}
+.day .n small{font-size:11px;font-weight:600;color:var(--muted);margin-right:2px}
+.dhead .time{font-size:12px;background:#efe9df;color:#5c554b;border-radius:10px;padding:2px 9px;margin-right:10px;white-space:nowrap}
+.why{background:#f3efe8;border-left:3px solid var(--accent);padding:10px 14px;margin:12px 16px 4px;border-radius:0 10px 10px 0;font-size:14px}
+.steps{margin:8px 0 0;padding:0 0 0 20px;font-size:14px;color:#3d3832}
+.steps li{display:list-item;padding:3px 0;border:0}
+.doneif{display:inline-block;margin-top:8px;font-size:13px;background:var(--ok-soft);color:#1f6b43;border-radius:8px;padding:4px 10px}
+.copybox{margin-top:8px;background:#fbf9f6;border:1px dashed #d8cfc1;border-radius:10px;padding:10px 12px;font-size:13.5px;white-space:pre-wrap;color:#34302b;position:relative}
+.copybox button{position:absolute;top:6px;right:6px;font-size:12px;padding:3px 9px}
+@media (max-width:720px){
+  .cal{grid-template-columns:repeat(7,1fr)}
+  .cal .wk{grid-column:1 / -1;flex-direction:row;justify-content:flex-start;padding-top:6px}
+  .cal .wk small{margin-left:6px}
+  .day .n small{display:none}
+  .dhead .time{order:2}
+}
+
+.snow{margin:6px 0 22px;border-radius:18px;overflow:hidden;background:linear-gradient(135deg,#1f3b5c 0%,#2d5b7f 55%,#3f7ea3 100%);color:#fff;padding:26px 24px}
+.snow .kick{font-size:12px;letter-spacing:1.2px;text-transform:uppercase;color:#bfe0f5;font-weight:700}
+.snow h3{margin:6px 0 6px;font-size:26px;line-height:1.2}
+.snow p{margin:0 0 16px;color:#dcecf7;max-width:720px}
+.chain{display:flex;flex-wrap:wrap;align-items:stretch;margin:0 0 18px}
+.chain .st{background:rgba(255,255,255,.12);border-radius:14px;padding:12px 14px;margin:0 8px 8px 0;flex:1;min-width:150px}
+.chain .st b{display:block;font-size:26px;line-height:1.1}
+.chain .st span{font-size:13px;color:#dcecf7}
+.chain .arrow{align-self:center;font-size:22px;color:#9fd0ee;margin:0 8px 8px 0}
+.snow .total{background:#fff;color:#1f3b5c;border-radius:14px;padding:14px 18px;display:flex;align-items:center;flex-wrap:wrap;margin-bottom:22px}
+.snow .total b{font-size:34px;margin-right:14px;color:#d9573b}
+.snow .total span{font-size:15px;flex:1;min-width:200px}
+.snow .big{background:rgba(0,0,0,.18);border-radius:16px;padding:20px;text-align:center;margin-top:4px}
+.snow .big .num{font-size:52px;font-weight:800;line-height:1;color:#ffd6a8;letter-spacing:-1px}
+.snow .big .cap{font-size:15px;color:#e6f2fa;margin-top:8px}
+.snow .fine{font-size:12.5px;color:#b8d4e6;margin-top:14px}
+@media (max-width:720px){.snow{padding:20px 16px}.snow h3{font-size:21px}.chain .arrow{display:none}.chain .st{min-width:40%}.snow .big .num{font-size:38px}}
+
+.tmin{display:inline-block;margin-left:8px;font-size:12px;font-weight:600;color:#5c554b;background:#efe9df;border-radius:8px;padding:1px 7px;white-space:nowrap;vertical-align:1px;text-decoration:none}
+.day .ct{display:block;font-size:11px;color:#8a8278;margin-top:2px}
+@media (max-width:720px){.day .ct{display:none}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <h1>Как привести клиентов в бот за 28 дней</h1>
+    <p>Пошаговый план привлечения клиентов. Бот, фотографии, себестоимость, метки источников, статьи и видео уже готовы — здесь только о том, где взять людей и как довести их до оплаты. Начинайте в любой день: День 1 — это день, когда вы открыли этот файл. Бюджет — около нуля.</p>
+    <div class="meta">
+      <div><b>28</b><span>дней</span></div>
+      <div><b>4</b><span>недели</span></div>
+      <div><b id="avgTime">—</b><span>в среднем в день</span></div>
+      <div><b id="totalTasks">—</b><span>задач</span></div>
+      <div><b id="doneTasks">0</b><span>выполнено</span></div>
+    </div>
+    <div class="progress"><i id="pbar"></i></div>
+    <div class="ptext" id="ptext">Прогресс: 0%</div>
+  </div>
+</header>
+
+<div class="wrap">
+<nav class="toc">
+  <a href="#calendar">Календарь</a>
+  <a href="#rules">Принципы</a>
+  <a href="#w1">Неделя 1</a>
+  <a href="#w2">Неделя 2</a>
+  <a href="#w3">Неделя 3</a>
+  <a href="#w4">Неделя 4</a>
+  <a href="#metrics">Метрики</a>
+  <a href="#templates">Шаблоны</a>
+</nav>
+
+<section id="calendar">
+  <h2>Календарь</h2>
+  <p class="lead">Под названием дня — сколько времени он займёт вместе с ежедневным минимумом. Нажмите на день, чтобы перейти к его задачам. Цветные точки показывают, чем вы заняты в этот день. Полоска внизу заполняется по мере того, как вы ставите галочки, а выполненный день становится зелёным. Каждый седьмой день — итоги недели и отдых.</p>
+  <div class="legend">
+    <span><i class="dot" style="background:var(--t-bot)"></i>Бот и механики</span>
+    <span><i class="dot" style="background:var(--t-chan)"></i>Свой канал</span>
+    <span><i class="dot" style="background:var(--t-video)"></i>Короткие видео</span>
+    <span><i class="dot" style="background:var(--t-comm)"></i>Люди и партнёры</span>
+    <span><i class="dot" style="background:var(--t-art)"></i>Статьи и площадки</span>
+    <span><i class="dot" style="background:var(--t-an)"></i>Аналитика</span>
+  </div>
+  <div class="card">
+    <div class="cal" id="cal"></div>
+  </div>
+</section>
+
+<section id="rules">
+  <h2>Шесть принципов</h2>
+  <p class="lead">Если какой-то день выпадет — не страшно, просто продолжайте со следующего. Эти правила важнее конкретных дней.</p>
+  <div class="grid2">
+    <div class="rule"><h4>1. У каждого источника своя ссылка</h4><p>Метки ?start=… у вас уже настроены — используйте их везде. Новому партнёру или площадке сразу заводите новую метку, иначе не поймёте, что сработало.</p></div>
+    <div class="rule"><h4>2. Показывать результат, а не бота</h4><p>Людей цепляет «селфи → красивое фото», а не описание функций. Каждый пост и каждое видео начинается с картинки «до/после».</p></div>
+    <div class="rule"><h4>3. Бесплатный шаг до денег</h4><p>Никаких обязательных подписок ради пробника. Человек сначала видит себя на фото, потом платит. Подписка на канал — только ради бонуса.</p></div>
+    <div class="rule"><h4>4. Каждый клиент приводит следующего</h4><p>Бонус за публикацию результата и за друга, который оплатил. Это единственный канал, который растёт сам, — поэтому с него и начинаем.</p></div>
+    <div class="rule"><h4>5. Регулярность важнее объёма</h4><p>Два поста в день каждый день дают больше, чем десять постов раз в неделю. Готовьте контент впрок и ставьте на отложенную публикацию.</p></div>
+    <div class="rule"><h4>6. Раз в неделю отсекать лишнее</h4><p>В каждый седьмой день смотрите цифры. Канал, который за неделю не дал ни одной оплаты, получает меньше времени, а лучший — вдвое больше.</p></div>
+  </div>
+</section>
+
+<div id="weeks"></div>
+
+<section id="metrics">
+  <h2>Метрики по неделям</h2>
+  <p class="lead">Заполняйте в дни 7, 14, 21 и 28. Цифры сохраняются автоматически. Жёстких целей нет: в правом столбце — признак, что всё идёт хорошо.</p>
+  <div class="card scroll">
+    <table id="mtable">
+      <thead><tr><th>Показатель</th><th>Неделя 1</th><th>Неделя 2</th><th>Неделя 3</th><th>Неделя 4</th><th>Хороший знак</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <p class="note" style="margin-top:10px">Тревожные сигналы. Селфи загружает меньше половины нажавших /start — переделайте первый экран. Оплачивает меньше 5% сделавших превью — пересмотрите оффер или цену. Источник две недели подряд не даёт оплат — уберите его.</p>
+
+  <h2 style="font-size:20px">Учёт источников</h2>
+  <p class="lead">Сколько людей и оплат принёс каждый канал за 28 дней. Берите цифры по ссылкам ?start=…</p>
+  <div class="card scroll">
+    <table id="stable">
+      <thead><tr><th>Источник</th><th>Метка</th><th>Пришло (/start)</th><th>Оплат</th><th>Часов потрачено</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="templates">
+  <h2>Готовые шаблоны</h2>
+  <p class="lead">Копируйте и подставляйте своё. Лучше немного переписать каждое сообщение под конкретного человека: одинаковые тексты замечают.</p>
+  <div id="tpls"></div>
+</section>
+
+<footer>
+  <button id="reset">Сбросить все отметки</button>
+  <p>Отметки и цифры сохраняются автоматически. Если открывать план из бота — они видны и на телефоне, и на компьютере.</p>
+</footer>
+</div>
+<script>
+(function(){
+var TAGS={bot:{name:"Бот",c:"#3b6fd9"},chan:{name:"Канал",c:"#d9573b"},video:{name:"Видео",c:"#9a4fd1"},comm:{name:"Люди",c:"#2f8f5b"},art:{name:"Площадки",c:"#c98a12"},an:{name:"Аналитика",c:"#5b6573"}};
+
+var WEEKS=[
+ {id:"w1",title:"Сарафан и первые люди",goal:"<b>Цель недели:</b> включить механики «приведи друга», пригласить 50–60 знакомых, запустить короткие видео и выйти на первые открытые площадки.",days:[
+  {n:1,focus:"Механики «приведи друга» и список знакомых",time:"≈ 2 часа",
+   why:"<b>Зачем этот день.</b> Каждый, кто придёт в бот в следующие недели, может привести ещё кого-то. Но только если к этому моменту уже работают бонус за друга и бонус за публикацию фото. Поэтому сначала включаем их, а уже потом зовём людей.",
+   t:[
+   ["bot","Проверить, как работает «приведи друга»","Нужно убедиться, что бонус за друга работает правильно — до того, как придут первые люди.",{
+     steps:["Откройте бота как обычный пользователь и найдите свою личную ссылку-приглашение.","Отправьте её другу или на свой второй аккаунт Telegram.","Пусть он перейдёт по ссылке, сделает превью и оплатит самый дешёвый пакет. Если это ваш второй аккаунт — оплатите сами.","Проверьте: пришёл ли вам бонус и пришло ли сообщение об этом?","Если бонус начисляется сразу за вход, без оплаты, — переделайте: бонус только после того, как друг заплатил. Иначе люди будут приглашать сами себя с разных аккаунтов."],
+     done:"Готово, если: бонус пришёл только после оплаты друга."}],
+   ["bot","Включить бонус за публикацию фото","Самая дешёвая реклама — когда клиент сам показывает своё фото друзьям.",{
+     steps:["Сразу после выдачи готовых фото бот отправляет сообщение с предложением (текст ниже).","Под сообщением две кнопки: «Поделиться» (открывает пересылку бота) и «Я выложил(а)».","По кнопке «Я выложил(а)» бот просит прислать скриншот сторис или поста.","Вы или бот проверяете скриншот и начисляете 2 фото в подарок.","Пройдите этот путь сами от начала до конца."],
+     done:"Готово, если: вы сами выложили сторис, прислали скриншот и получили бонус.",
+     copy:"Понравились фото? 😍\n\nВыложите любое из них в сторис или пост и отметьте нашего бота — и мы подарим вам ещё 2 фото в любом образе 🎁\n\nПосле публикации нажмите «Я выложил(а)» и пришлите скриншот."}],
+   ["comm","Составить список знакомых","Завтра вы будете писать им лично. Сегодня только собрать имена — это быстро.",{
+     steps:["Откройте заметки или таблицу.","Пролистайте контакты Telegram сверху вниз и выпишите всех, кому не стыдно написать.","Добавьте людей из WhatsApp, VK, рабочих и школьных чатов.","Поставьте звёздочку ★ тем, кто ведёт соцсети или у кого много друзей, — им пишите первыми.","Не нужно никому писать сегодня — только список."],
+     done:"Готово, если: в списке 50 человек или больше."}]
+  ]},
+  {n:2,focus:"Первые люди и площадки для видео",t:[
+   ["comm","Написать 30 знакомым лично","Шаблон «Сообщение знакомым», ссылка ?start=friends. Начните с отмеченных звёздочкой. Просите честный отзыв, а не покупку: покупки придут сами."],
+   ["video","Завести аккаунты для коротких видео","TikTok, Instagram Reels, VK Клипы, YouTube Shorts. Везде одно имя, в описании — ссылка на бот с меткой площадки. Если аккаунты уже есть — просто проверьте ссылки."]]},
+  {n:3,focus:"Первые видео",after:"SNOW",t:[
+   ["video","Выложить первые 3 видео на 4 площадки","Готовые видео — в TikTok, Reels, VK Клипы и Shorts. Лучшее время — 18:00–21:00."],
+   ["comm","Написать ещё 30 знакомым","Тех, кто уже попробовал, попросите переслать ссылку одному-двум друзьям."],
+   ["comm","Записать отзывы знакомых","Всё, что они говорят о боте: что понравилось, что смутило, где запутались."]]},
+  {n:4,focus:"Статья на vc.ru",t:[
+   ["art","Опубликовать статью на vc.ru","Готовую статью — утром в будний день. Ссылка ?start=vc в конце."],
+   ["comm","Ответить на комментарии к статье","Первые часы после публикации самые важные: загляните 2–3 раза и ответьте каждому — это поднимает статью."]]},
+  {n:5,focus:"Пикабу",t:[
+   ["art","Выложить пост на Пикабу","Готовый пост «селфи → результат». Одна ссылка — в конце: Пикабу не любит прямую рекламу."],
+   ["comm","Ответить на комментарии","Под постом на Пикабу и под статьёй на vc.ru."]]},
+  {n:6,focus:"Дзен и DTF",t:[
+   ["art","Опубликовать статью в Дзене и на DTF","Готовую статью со своими метками ?start=dzen и ?start=dtf."],
+   ["comm","Ответить на комментарии","Под всеми публикациями и видео."]]},
+  {n:7,rest:true,focus:"Итоги недели и отдых",t:[
+   ["an","Итоги недели 1","Заполните первый столбец в «Метриках»: сколько пришло, сколько загрузили селфи, сколько оплатили и откуда."],
+   ["an","Выбрать 3 главные претензии знакомых","Самые частые вопросы или жалобы — исправите их в начале следующей недели."],
+   ["chan","Поставить посты на неделю вперёд","14 постов на отложенную публикацию."]]}
+ ]},
+ {id:"w2",title:"Открытые площадки и поиск партнёров",goal:"<b>Цель недели:</b> пойдут люди не только от знакомых. Статья разошлась по площадкам, бот есть в каталогах, видео выходят каждый день, составлен список партнёров и отправлены первые предложения.",days:[
+  {n:8,focus:"Исправления и разбор видео",t:[
+   ["bot","Исправить 3 претензии знакомых","То, что выписали в день 7."],
+   ["an","Разобрать первые видео","Какое набрало больше просмотров и досмотров? В следующие дни выкладывайте в первую очередь похожие из готовых."]]},
+  {n:9,focus:"Каталоги ботов",t:[
+   ["art","Добавить бот в 5–10 каталогов Telegram-ботов","Найдите русскоязычные каталоги через поиск Telegram и Яндекса. Хорошее описание и 3 картинки. Метка ?start=catalog."],
+   ["chan","Опрос в канале","«Какой образ хотите следующим?» — вовлекает подписчиков и даёт идеи для постов."]]},
+  {n:10,focus:"Тренды и комментарии",t:[
+   ["video","Посмотреть тренды","Какие ролики с ИИ-фото сейчас в рекомендациях («угадай, где ИИ», превращение, реакция)? Подберите похожие из готовых видео и выложите их первыми."],
+   ["comm","Ответить на все комментарии","Под статьями, видео и в канале. Каждый ответ даёт ещё показы."]]},
+  {n:11,focus:"Список партнёров",t:[
+   ["comm","Составить список 30 Telegram-каналов","1–20 тыс. подписчиков, живые комментарии. Темы: мамы и семья, мода и красота, лайфстайл, нейросети, фотография. Ищите через поиск Telegram и каталоги каналов."],
+   ["comm","Подготовить предложение админам","Бесплатная фотосессия админу + взаимный пост или совместный розыгрыш. Шаблон — в «Шаблонах». Каждому партнёру — своя метка ?start=p_имя."]]},
+  {n:12,focus:"Первые партнёры",t:[
+   ["comm","Написать 15 админам","Начните с каналов, чья аудитория ближе всего к вашей: семья, красота. Сразу приложите 2–3 примера."],
+   ["comm","Сделать фотосессии согласившимся","Результат — лучшая реклама для админа: ему самому захочется показать свои фото."]]},
+  {n:13,focus:"Ещё партнёры и блогеры",t:[
+   ["comm","Написать ещё 15 админам",""],
+   ["comm","Написать 10 небольшим блогерам","1–10 тыс. подписчиков в VK, Telegram и других соцсетях. Бесплатная фотосессия и просьба о честной сторис, если понравится. Шаблон — в «Шаблонах»."]]},
+  {n:14,rest:true,focus:"Итоги недели и отдых",t:[
+   ["an","Итоги недели 2","Второй столбец «Метрик» и таблица источников. Какая площадка дала оплаты, а не только /start?"],
+   ["an","Решить, чем заниматься на неделе 3","Лучшему каналу — вдвое больше времени. Каналу без оплат — вдвое меньше или совсем ничего."],
+   ["chan","Посты на неделю вперёд","14 постов на отложенную публикацию."]]}
+ ]},
+ {id:"w3",title:"Чужие аудитории и слабые места",goal:"<b>Цель недели:</b> выйти к аудиториям партнёров, провести розыгрыш, найти шаг воронки, на котором теряется больше всего людей, и исправить его.",days:[
+  {n:15,focus:"Размещения у партнёров",t:[
+   ["comm","Выйти с первыми взаимными постами","Для чужого канала — лучший пример, короткий текст и кнопка с меткой партнёра."],
+   ["comm","Напомнить тем, кто не ответил","Одно короткое сообщение. Больше не нужно."]]},
+  {n:16,focus:"Розыгрыш",t:[
+   ["chan","Запустить розыгрыш в канале","Приз — бесплатные пакеты фотосессий. Условие — подписка на канал и приглашение друга в бот. Итоги — через 5–7 дней. Сверьтесь с правилами Telegram для конкурсов."],
+   ["comm","Позвать партнёров в розыгрыш","Совместный розыгрыш с 1–2 каналами — это обмен аудиториями."]]},
+  {n:17,focus:"Вторая статья",t:[
+   ["art","Опубликовать вторую статью","Готовую статью — на vc.ru и в Дзене, со своими метками."],
+   ["comm","Ответить на комментарии к статье","Загляните 2–3 раза за день и ответьте каждому."]]},
+  {n:18,focus:"Где теряются люди",t:[
+   ["an","Найти самый слабый шаг воронки","/start → селфи → превью → оплата. Туда, где процент ниже всего, направьте силы следующих дней."],
+   ["bot","Рассылка для ушедших","Всем, кто сделал превью, но не купил: новый образ и небольшой бонус на ограниченный срок. Одно сообщение, без давления."]]},
+  {n:19,focus:"Починить слабый шаг",t:[
+   ["bot","Улучшить слабый шаг","Мало загружают селфи — упростите инструкцию и покажите пример хорошего селфи. Мало оплачивают — добавьте отзывы и сравнение с ценой студии."],
+   ["video","Перейти на 2 видео в день","Если лучший формат приводит людей, до конца плана выкладывайте по 2 готовых видео в день."]]},
+  {n:20,focus:"Повтор с лучшими партнёрами",t:[
+   ["comm","Повторно разместиться у 3 лучших партнёров","Новые примеры, та же метка — чтобы сравнить результат."],
+   ["comm","Написать 15 новым админам","Похожим на тех, кто уже дал оплаты."]]},
+  {n:21,rest:true,focus:"Итоги недели и отдых",t:[
+   ["an","Итоги недели 3","Третий столбец «Метрик». По каждому партнёру: сколько пришло людей и сколько оплат."],
+   ["chan","Посты на неделю вперёд",""]]}
+ ]},
+ {id:"w4",title:"Доверие, повторные продажи и итоги",goal:"<b>Цель недели:</b> собрать отзывы, продать повторно тем, кто уже купил, подвести итоги и выбрать 2–3 канала, на которых стоит сосредоточиться дальше.",days:[
+  {n:22,focus:"Отзывы",t:[
+   ["chan","Собрать 10 отзывов с фото","Попросите клиентов коротко написать впечатления. Публиковать — только с их согласия."],
+   ["chan","Пост с подборкой отзывов","Закрепите его рядом с постом «Как это работает»."],
+   ["bot","Показать отзывы в боте","1–2 коротких отзыва на экране перед оплатой."]]},
+  {n:23,focus:"Второй заход на площадки",t:[
+   ["art","Выложить второй пост на Пикабу","Готовый пост. Одна ссылка — в конце."],
+   ["chan","Итоги розыгрыша","Объявить победителей и показать их фото."]]},
+  {n:24,focus:"Конкурс контента",t:[
+   ["chan","Конкурс «лучшее фото»","Клиенты присылают свой результат, подписчики голосуют, победитель получает бесплатный пакет. Даёт много готового контента."]]},
+  {n:25,focus:"Повторные продажи",t:[
+   ["bot","Рассылка платящим клиентам","Новый образ или пакет для пары или семьи со скидкой для постоянных. Продать повторно гораздо дешевле, чем найти нового клиента."],
+   ["comm","Попросить лучших клиентов привести друга","Лично напишите 10–20 самым довольным и напомните про бонус за друга."]]},
+  {n:26,focus:"Итоги 4 недель",t:[
+   ["an","Посчитать итоги","Всего: /start, превью, оплаты, выручка. По каждому источнику: люди, оплаты, потраченные часы. Заполните «Учёт источников»."],
+   ["an","Посчитать, сколько приносит час","Выручка источника ÷ часы, потраченные на него. Это главный ориентир, куда вкладывать силы дальше."]]},
+  {n:27,focus:"План на следующий месяц",t:[
+   ["an","Оставить 2–3 лучших канала","Остальные поставить на паузу или поддерживать по минимуму."],
+   ["an","Решить про платное продвижение","Если бесплатные каналы стабильно приносят оплаты и понятно, во сколько обходится клиент, — можно пробовать платные посты в Telegram-каналах на небольшой бюджет."]]},
+  {n:28,rest:true,focus:"Итоги и отдых",t:[
+   ["an","Заполнить четвёртый столбец «Метрик»",""],
+   ["chan","Пост «Первый месяц: что получилось»","Поблагодарите подписчиков — людям нравится следить за историей проекта."]]}
+ ]}
+];
+
+function dayMin(day){var k="d"+day.n,m=0;for(var i=0;i<day.t.length;i++)m+=TIMES[k+"-t"+i]||0;var r=routineFor(day);for(var j=0;j<r.length;j++)m+=RT[r[j][1]]||0;return m;}
+function weekMin(w){var m=0;for(var i=0;i<w.days.length;i++)m+=dayMin(w.days[i]);return m;}
+function routineFor(day){
+  var r=[["chan","2 поста в канале вышли","Проверьте отложенную публикацию."]];
+  if(day.n>=4&&!day.rest) r.push(["video","Видео опубликовано на 4 площадках","TikTok, Reels, VK Клипы, Shorts."]);
+  r.push(["an","15 минут: цифры и поддержка","/start, селфи и оплаты за вчера; ответить на вопросы в боте."]);
+  return r;
+}
+
+var SNOWHTML='<div class="snow"><div class="kick">Эффект снежного кома</div><h3>Три дня, 60 сообщений — и уже 210 человек в боте</h3><p>Вы лично написали 60 знакомым. Дальше вы только наблюдаете: люди получают свои фото, показывают друзьям, а бонус за друга подталкивает их звать ещё. Смотрите, как это складывается.</p><div class="chain"><div class="st"><b>50</b><span>знакомых пришли в бот по вашему сообщению</span></div><div class="arrow">→</div><div class="st"><b>+100</b><span>каждый показал фото двум друзьям</span></div><div class="arrow">→</div><div class="st"><b>+60</b><span>30 новичков тоже позвали по двое</span></div></div><div class="total"><b>210</b><span>человек в боте к концу Дня 3 — это в 3,5 раза больше тех, кому вы писали сами, и без рубля на рекламу.</span></div><div class="kick">А теперь — весь месяц</div><h3>Ком продолжает катиться</h3><p>Видео, статьи и партнёры приводят новых людей каждый день. И каждый из них — это не один клиент, а начало новой цепочки.</p><div class="chain"><div class="st"><b>210</b><span>первые три дня</span></div><div class="arrow">+</div><div class="st"><b>≈ 1 000</b><span>новых людей за месяц из видео, статей и партнёров</span></div><div class="arrow">+</div><div class="st"><b>1 000–2 000</b><span>каждый приведёт 1–2 знакомых</span></div><div class="arrow">+</div><div class="st"><b>2 000–6 000</b><span>а те позовут ещё по 2–3</span></div></div><div class="big"><div class="num">4 200 – 9 200</div><div class="cap">человек в боте к концу месяца — и больше половины из них приведут ваши же клиенты, а не реклама</div></div><div class="fine">Расчёт показывает, что возможно, если бонус за друга и бонус за публикацию работают с первого дня. Поэтому День 1 — самый важный в этом плане. Сверяйте прогноз с реальными цифрами в разделе «Метрики» каждые 7 дней.</div></div>';
+var TIMES={"d1-t0":30,"d1-t1":60,"d1-t2":30,"d2-t0":60,"d2-t1":40,"d3-t0":15,"d3-t1":60,"d3-t2":15,"d4-t0":15,"d4-t1":20,"d5-t0":15,"d5-t1":15,"d6-t0":15,"d6-t1":20,"d7-t0":30,"d7-t1":15,"d7-t2":90,"d8-t0":60,"d8-t1":20,"d9-t0":60,"d9-t1":5,"d10-t0":20,"d10-t1":30,"d11-t0":60,"d11-t1":30,"d12-t0":60,"d12-t1":30,"d13-t0":45,"d13-t1":45,"d14-t0":30,"d14-t1":15,"d14-t2":90,"d15-t0":30,"d15-t1":15,"d16-t0":40,"d16-t1":20,"d17-t0":15,"d17-t1":20,"d18-t0":30,"d18-t1":30,"d19-t0":90,"d19-t1":15,"d20-t0":30,"d20-t1":45,"d21-t0":30,"d21-t1":90,"d22-t0":45,"d22-t1":20,"d22-t2":30,"d23-t0":15,"d23-t1":15,"d24-t0":40,"d25-t0":30,"d25-t1":40,"d26-t0":60,"d26-t1":20,"d27-t0":20,"d27-t1":30,"d28-t0":20,"d28-t1":30};
+var RT={"2 поста в канале вышли":5,"Видео опубликовано на 4 площадках":15,"15 минут: цифры и поддержка":15};
+function fmt(m){var h=Math.floor(m/60),mm=m%60;return h?(h+" ч"+(mm?" "+mm+" мин":"")):(mm+" мин");}
+var KEY="plan28_v2";
+var state={};
+try{state=JSON.parse(localStorage.getItem(KEY)||"{}")||{};}catch(e){state={};}
+/* Внутри Telegram отметки дублируются в облако Telegram:
+   не пропадут при очистке кэша и видны с телефона и компьютера. */
+var TG=(window.Telegram&&window.Telegram.WebApp)||null;
+var CS=(TG&&TG.CloudStorage&&TG.initData)?TG.CloudStorage:null;
+if(TG){try{TG.ready();TG.expand();}catch(e){}}
+var CHUNK=3800,saveTimer=null;
+function cloudSave(){
+  if(!CS) return;
+  var str=JSON.stringify(state),parts=[];
+  for(var i=0;i<str.length;i+=CHUNK) parts.push(str.slice(i,i+CHUNK));
+  try{
+    CS.setItem(KEY+"_n",String(parts.length));
+    for(var j=0;j<parts.length;j++) CS.setItem(KEY+"_"+j,parts[j]);
+  }catch(e){}
+}
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}
+  clearTimeout(saveTimer); saveTimer=setTimeout(cloudSave,600);
+}
+function cloudLoad(done){
+  if(!CS) return;
+  try{
+    CS.getItem(KEY+"_n",function(err,n){
+      n=parseInt(n,10); if(err||!n) return;
+      var keys=[];for(var i=0;i<n;i++) keys.push(KEY+"_"+i);
+      CS.getItems(keys,function(err2,vals){
+        if(err2||!vals) return;
+        var str="";for(var i=0;i<keys.length;i++) str+=(vals[keys[i]]||"");
+        try{var cloud=JSON.parse(str);
+          if(cloud&&Object.keys(cloud).length>Object.keys(state).length){state=cloud;
+            try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}
+            done&&done();}
+        }catch(e){}
+      });
+    });
+  }catch(e){}
+}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");}
+function dayKey(day){return "d"+day.n;}
+var allDays=[],COPY=[];
+
+function tm(id,t){return /-r\d+$/.test(id)?(RT[t[1]]||0):(TIMES[id]||0);}
+function taskHtml(id,t,small){
+  var tag=TAGS[t[0]],x=t[3]||null,extra="";
+  if(x){
+    if(x.steps){ extra+='<ol class="steps">'; for(var i=0;i<x.steps.length;i++) extra+='<li>'+esc(x.steps[i])+'</li>'; extra+='</ol>'; }
+    if(x.copy){ COPY.push(x.copy); extra+='<div class="copybox"><button class="cpy" data-c="'+(COPY.length-1)+'">Копировать</button>'+esc(x.copy)+'</div>'; }
+    if(x.done) extra+='<span class="doneif">'+esc(x.done)+'</span>';
+  }
+  return '<li><label><input type="checkbox" data-id="'+id+'"'+(state[id]?' checked':'')+'><span class="txt"><span class="t">'+esc(t[1])+'</span>'+(tm(id,t)?'<span class="tmin">⏱ '+fmt(tm(id,t))+'</span>':'')+''+(t[2]?'<span class="how">'+esc(t[2])+'</span>':'')+'</span></label>'+(small?'':'<span class="pill" style="background:'+tag.c+'">'+tag.name+'</span>')+'</li>'+(extra?'<li style="display:block;padding:0 0 12px 34px;border-bottom:1px dashed #efe9e0">'+extra+'</li>':'');
+}
+
+var html="";
+for(var wi=0;wi<WEEKS.length;wi++){
+  var w=WEEKS[wi];
+  html+='<section class="week" id="'+w.id+'"><div class="week-head"><span class="num">НЕДЕЛЯ '+(wi+1)+'</span><h3>'+w.title+'</h3><span class="dates">дни '+(wi*7+1)+'–'+(wi*7+7)+' · ⏱ '+fmt(weekMin(w))+' за неделю</span></div><div class="week-goal">'+w.goal+'</div>';
+  for(var di=0;di<w.days.length;di++){
+    var day=w.days[di]; allDays.push(day); var k=dayKey(day);
+    html+='<div class="dcard" id="day-'+k+'"><div class="dhead"><span class="date">День '+day.n+'</span><span class="focus">'+esc(day.focus)+'</span>'+'<span class="time">⏱ '+fmt(dayMin(day))+'</span>'+'<span class="cnt"></span></div>';
+    if(day.why) html+='<div class="why">'+day.why+'</div>';
+    html+='<ul class="tasks">';
+    for(var ti=0;ti<day.t.length;ti++) html+=taskHtml(k+"-t"+ti,day.t[ti],false);
+    html+='</ul><div class="routine"><div class="rt">Ежедневный минимум</div><ul class="tasks">';
+    var r=routineFor(day);
+    for(var ri=0;ri<r.length;ri++) html+=taskHtml(k+"-r"+ri,r[ri],true);
+    html+='</ul></div></div>';
+    if(day.after==='SNOW') html+=SNOWHTML;
+  }
+  html+='</section>';
+}
+document.getElementById("weeks").innerHTML=html;
+
+/* calendar: 4 rows × 7 days */
+var ch="";
+for(var wi2=0;wi2<WEEKS.length;wi2++){
+  ch+='<div class="wk">Неделя '+(wi2+1)+'<small>дни '+(wi2*7+1)+'–'+(wi2*7+7)+'</small></div>';
+  for(var j=0;j<WEEKS[wi2].days.length;j++){
+    var cday=WEEKS[wi2].days[j],tags={},dots="";
+    for(var t=0;t<cday.t.length;t++) tags[cday.t[t][0]]=1;
+    for(var tg in tags) dots+='<i class="dot" style="background:'+TAGS[tg].c+'"></i>';
+    ch+='<div class="day'+(cday.rest?' rest':'')+'" data-k="'+dayKey(cday)+'"><span class="n"><small>День</small>'+cday.n+'</span><span class="w">'+esc(cday.focus)+'</span><span class="ct">⏱ '+fmt(dayMin(cday))+'</span><span class="dots">'+dots+'</span><span class="bar"><i></i></span></div>';
+  }
+}
+document.getElementById("cal").innerHTML=ch;
+
+var cells=document.querySelectorAll(".day[data-k]");
+for(var c=0;c<cells.length;c++){
+  cells[c].onclick=function(){
+    var card=document.getElementById("day-"+this.getAttribute("data-k"));
+    if(!card) return;
+    var y=card.getBoundingClientRect().top+(window.pageYOffset||document.documentElement.scrollTop)-70;
+    try{window.scrollTo({top:y,behavior:"smooth"});}catch(e){window.scrollTo(0,y);}
+    card.className=card.className.replace(" flash","");
+    void card.offsetWidth; card.className+=" flash";
+  };
+}
+var boxes=document.querySelectorAll('.tasks input[type=checkbox]');
+for(var b=0;b<boxes.length;b++){
+  boxes[b].onchange=function(){
+    var id=this.getAttribute("data-id");
+    if(this.checked) state[id]=1; else delete state[id];
+    save(); refresh();
+  };
+}
+function copyText(txt,btn){
+  function ok(){var o=btn.innerHTML;btn.innerHTML="Скопировано ✓";setTimeout(function(){btn.innerHTML=o;},1500);}
+  function fallback(){var ta=document.createElement("textarea");ta.value=txt;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");ok();}catch(e){}document.body.removeChild(ta);}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(ok,fallback);}else fallback();
+}
+var cps=document.querySelectorAll(".cpy");
+for(var cp=0;cp<cps.length;cp++) cps[cp].onclick=function(e){e.preventDefault();copyText(COPY[+this.getAttribute("data-c")],this);};
+
+function refresh(){
+  var total=0,done=0;
+  for(var i=0;i<allDays.length;i++){
+    var k=dayKey(allDays[i]);
+    var card=document.getElementById("day-"+k);
+    var cb=card.querySelectorAll("input[type=checkbox]"),dd=0;
+    for(var j=0;j<cb.length;j++) if(cb[j].checked) dd++;
+    total+=cb.length; done+=dd;
+    var full=dd===cb.length;
+    card.querySelector(".cnt").innerHTML=(full?"✓ ":"")+dd+" / "+cb.length;
+    card.className="dcard"+(full?" done":"");
+    var cell=document.querySelector('.day[data-k="'+k+'"]');
+    if(cell){
+      cell.querySelector(".bar i").style.width=Math.round(dd/cb.length*100)+"%";
+      cell.className=cell.className.replace(/ done/g,"")+(full?" done":"");
+    }
+  }
+  var p=total?Math.round(done/total*100):0;
+  document.getElementById("totalTasks").innerHTML=total;
+  document.getElementById("doneTasks").innerHTML=done;
+  document.getElementById("pbar").style.width=p+"%";
+  document.getElementById("ptext").innerHTML="Прогресс: "+p+"% ("+done+" из "+total+")";
+}
+refresh();
+
+/* metrics */
+var METRICS=[
+ ["Подписчики канала","Растёт каждую неделю"],
+ ["Нажали /start","Растёт каждую неделю"],
+ ["Загрузили селфи","Больше 50% от /start"],
+ ["Сделали превью","Почти все, кто загрузил селфи"],
+ ["Ответили «похоже»","Больше 60% от превью"],
+ ["Оплатили","5–10% от превью и больше"],
+ ["Выручка, ₽","Растёт каждую неделю"],
+ ["Пришли по рефералке","Доля растёт"],
+ ["Опубликовали результат ради бонуса","Больше 10% платящих"]
+];
+var mb="";
+for(var m=0;m<METRICS.length;m++){
+  mb+="<tr><td><b>"+METRICS[m][0]+"</b></td>";
+  for(var wk=1;wk<=4;wk++) mb+='<td><input data-m="m'+m+'w'+wk+'" inputmode="numeric"></td>';
+  mb+='<td class="note">'+METRICS[m][1]+"</td></tr>";
+}
+document.querySelector("#mtable tbody").innerHTML=mb;
+var SOURCES=[["Знакомые","friends"],["Свой канал","channel"],["TikTok","tiktok"],["Reels","reels"],["VK Клипы","vk"],["YouTube Shorts","shorts"],["vc.ru","vc"],["Пикабу","pikabu"],["Дзен и DTF","dzen, dtf"],["Каталоги ботов","catalog"],["Партнёрские каналы","p_…"],["Блогеры","b_…"],["Рефералка","ref"]];
+var sb="";
+for(var s=0;s<SOURCES.length;s++){
+  sb+='<tr><td><b>'+SOURCES[s][0]+'</b></td><td class="note">?start='+SOURCES[s][1]+'</td>';
+  for(var x=0;x<3;x++) sb+='<td><input data-m="s'+s+'c'+x+'" inputmode="numeric"></td>';
+  sb+="</tr>";
+}
+document.querySelector("#stable tbody").innerHTML=sb;
+var inputs=document.querySelectorAll("td input");
+for(var n=0;n<inputs.length;n++){
+  var key="v_"+inputs[n].getAttribute("data-m");
+  if(state[key]) inputs[n].value=state[key];
+  inputs[n].oninput=function(){ var kk="v_"+this.getAttribute("data-m"); if(this.value) state[kk]=this.value; else delete state[kk]; save(); };
+}
+
+/* templates */
+var TPL=[
+ ["Сообщение знакомым","Привет! Я запустил бота, который делает профессиональную фотосессию по обычному селфи — прямо в Telegram, за пару минут.\n\nМне очень важно честное мнение: попробуй, пожалуйста, и скажи, похоже на тебя или нет. Превью бесплатное.\n\n[ссылка ?start=friends]\n\nЕсли понравится, буду благодарен, если перешлёшь одному-двум друзьям 🙏"],
+ ["Предложение админу канала","Здравствуйте, [имя]! Читаю ваш канал про [тема], особенно понравился пост про [конкретный пост].\n\nЯ сделал Telegram-бота, который создаёт фотосессию по обычному селфи. Хочу предложить:\n— бесплатно сделать фотосессию вам, чтобы вы увидели результат на себе;\n— взаимный пост или совместный розыгрыш фотосессий для ваших подписчиков.\n\nПримеры: [2–3 картинки]\nЕсли интересно — пришлю детали. Если нет — спасибо, что прочитали!"],
+ ["Сообщение небольшому блогеру","Привет, [имя]! Слежу за вашими [сторис/постами] — у вас очень живая подача.\n\nУ меня бот, который делает фотосессию по селфи. Хочу подарить вам бесплатную фотосессию — просто посмотреть, как вам результат.\n\nЕсли понравится, буду рад честной сторис с отметкой. Если нет — никаких обязательств.\n\nСсылка для вас: [ссылка ?start=b_имя]"],
+ ["Структура поста в канал","[Картинка: 1 селфи + 2–3 результата]\n\nИз одного селфи — фотосессия в [образ] ✨\n[Одна строка: что за образ и кому подойдёт]\n\nПревью бесплатно, пакет — [цена]\n👉 [кнопка «Сделать себе»]\n\n---\nДругие форматы постов:\n• «Угадайте, где настоящее фото, а где ИИ» (ответ — в следующем посте)\n• «Было / стало» с историей клиента\n• Подборка «5 образов для аватарки»\n• Отзыв клиента со скриншотом"]
+];
+var th="";
+for(var z=0;z<TPL.length;z++) th+='<div class="tpl"><div class="tpl-h"><b>'+TPL[z][0]+'</b><button data-i="'+z+'">Копировать</button></div><pre>'+esc(TPL[z][1])+'</pre></div>';
+document.getElementById("tpls").innerHTML=th;
+var btns=document.querySelectorAll(".tpl button");
+for(var y=0;y<btns.length;y++){
+  btns[y].onclick=function(){
+    var txt=TPL[+this.getAttribute("data-i")][1],btn=this;
+    function ok(){btn.innerHTML="Скопировано ✓";setTimeout(function(){btn.innerHTML="Копировать";},1500);}
+    function fallback(){var ta=document.createElement("textarea");ta.value=txt;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");ok();}catch(e){}document.body.removeChild(ta);}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(ok,fallback);}else fallback();
+  };
+}
+
+function applyState(){
+  var bx=document.querySelectorAll('.tasks input[type=checkbox]');
+  for(var i=0;i<bx.length;i++) bx[i].checked=!!state[bx[i].getAttribute("data-id")];
+  var ins=document.querySelectorAll("td input");
+  for(var j=0;j<ins.length;j++) ins[j].value=state["v_"+ins[j].getAttribute("data-m")]||"";
+  refresh();
+}
+cloudLoad(applyState);
+document.getElementById("reset").onclick=function(){
+  function doReset(){ state={}; try{localStorage.removeItem(KEY);}catch(e){} cloudSave(); applyState(); }
+  if(TG&&TG.showConfirm&&TG.initData){ TG.showConfirm("Снять все галочки и очистить цифры?",function(ok){ if(ok) doReset(); }); }
+  else if(window.confirm("Снять все галочки и очистить цифры?")) doReset();
+};
+(function(){var m=0;for(var i=0;i<WEEKS.length;i++)m+=weekMin(WEEKS[i]);document.getElementById("avgTime").innerHTML="≈ "+fmt(Math.round(m/28/5)*5);})();
+})();
+</script>
+</body>
+</html>
